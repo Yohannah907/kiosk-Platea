@@ -1,0 +1,12 @@
+node_modules/
+selenium-tests/node_modules/
+selenium-tests/reports/
+webapi/bin/
+webapi/obj/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example

@@ -1,0 +1,14 @@
+{
+  "name": "platea-selenium-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Automated Selenium WebDriver test scenarios and HTML test execution reporter for Platea Kiosk",
+  "scripts": {
+    "test": "node platea.selenium.mjs",
+    "test:headless": "HEADLESS=1 node platea.selenium.mjs"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.25.0"
+  }
+}
