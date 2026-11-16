@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { PlateaLogo } from '../components/PlateaLogo';
-import { formatMoney } from '../data/menuData';
+import { formatCurrency } from '../data/menuData';
 import { OrderSummary } from '../types/kiosk';
 
 interface OrderSuccessPageProps {
@@ -66,7 +66,7 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({
                   data-testid="success-order-total"
                   className="tabular-nums"
                 >
-                  {formatMoney(displayOrder.total)}
+                  {formatCurrency(displayOrder.total)}
                 </span>
               </div>
 
@@ -87,6 +87,27 @@ export const OrderSuccessPage: React.FC<OrderSuccessPageProps> = ({
                 </span>
               </div>
             </div>
+
+            {(displayOrder.pointsEarned || displayOrder.pointsRedeemed) && (
+              <section
+                data-testid="checkout-points-summary"
+                className="mt-5 rounded-2xl border border-[#b8e4bf] bg-white/70 p-4"
+              >
+                {displayOrder.pointsEarned ? (
+                  <p className="text-[18px] font-medium text-[#04502a]">
+                    +{displayOrder.pointsEarned} loyalty points earned
+                  </p>
+                ) : null}
+                {displayOrder.pointsRedeemed ? (
+                  <p className="text-[18px] font-medium text-[#04502a]">
+                    {displayOrder.pointsRedeemed} loyalty points used
+                    {displayOrder.paymentMethod === 'Loyalty Points'
+                      ? ` (${formatCurrency(displayOrder.total)} paid)`
+                      : ''}
+                  </p>
+                ) : null}
+              </section>
+            )}
 
             <button
               type="button"

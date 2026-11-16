@@ -13,8 +13,13 @@ public class StudentAccount
     [MaxLength(120)]
     public string FullName { get; set; } = "Campus Student";
 
+    [MaxLength(120)]
+    public string Course { get; set; } = string.Empty;
+
     [Column(TypeName = "decimal(10,2)")]
     public decimal Balance { get; set; } = 890.00m;
 
-    public int RewardsPoints { get; set; } = 0;
+    public int LoyaltyPoints { get; set; } = 0;
+
+    public List<LoyaltyTransaction> LoyaltyTransactions { get; set; } = new();
 }

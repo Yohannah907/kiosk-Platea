@@ -3,30 +3,41 @@ import {
   ClipboardList,
   ExternalLink,
   FileCheck2,
+  Award,
   Plus,
+  RefreshCw,
   Search,
   Trash2,
   UtensilsCrossed,
 } from 'lucide-react';
-import { CATEGORIES, formatMoney, getItemCategories } from '../data/menuData';
+import { CATEGORIES, formatCurrency, getItemCategories } from '../data/menuData';
 import { isApiConfigured } from '../services/api';
 import {
   AdminOrderRecord,
   AdminOrderStatus,
   Category,
+  LoyaltyTransaction,
   MenuItem,
+  StudentAccount,
 } from '../types/kiosk';
 import { TestReportViewer } from './TestReportViewer';
 
-type AdminTab = 'orders' | 'menu' | 'testing';
+type AdminTab = 'orders' | 'menu' | 'rewards' | 'testing';
 
 interface AdminDashboardProps {
   menuItems: Record<string, MenuItem>;
   orders: AdminOrderRecord[];
+  ordersError: string;
+  isLoadingOrders: boolean;
+  onRefreshOrders: () => void;
   onAddMenuItem: (item: MenuItem) => void;
   onUpdateMenuItem: (id: string, patch: Partial<MenuItem>) => void;
   onDeleteMenuItem: (id: string) => void;
   onUpdateOrderStatus: (orderNumber: string, status: AdminOrderStatus) => void;
+  students: StudentAccount[];
+  loyaltyTransactions: LoyaltyTransaction[];
+  rewardsError: string;
+  onResetSemesterPoints: () => void;
   onReturnToKiosk: () => void;
 }
 
@@ -40,10 +51,17 @@ const ORDER_STATUSES: AdminOrderStatus[] = [
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   menuItems,
   orders,
+  ordersError,
+  isLoadingOrders,
+  onRefreshOrders,
   onAddMenuItem,
   onUpdateMenuItem,
   onDeleteMenuItem,
   onUpdateOrderStatus,
+  students,
+  loyaltyTransactions,
+  rewardsError,
+  onResetSemesterPoints,
   onReturnToKiosk,
 }) => {
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
@@ -66,7 +84,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     const matchesQ =
       !q ||
       item.name.toLowerCase().includes(q) ||
-      item.keywords.toLowerCase().includes(q);
+      item.keywords.toLowerCase().includes(q) ||
+      cats.some((category) => category.toLowerCase().includes(q));
     return matchesCat && matchesQ;
   });
 
@@ -141,6 +160,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             type="button"
+            onClick={() => setActiveTab('rewards')}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              activeTab === 'rewards'
+                ? 'bg-[#effff1] text-[#04502a]'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <Award className="w-4 h-4 shrink-0" />
+            <span>Loyalty Rewards</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('testing')}
             className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
               activeTab === 'testing'
@@ -181,6 +213,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ? 'Live Orders'
                 : activeTab === 'menu'
                   ? 'Menu Management'
+                  : activeTab === 'rewards'
+                    ? 'Loyalty Rewards'
                   : 'Selenium & Reports'}
             </span>
           </div>
@@ -195,7 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <span>
               Sales:{' '}
               <strong className="text-slate-900">
-                ₱ {formatMoney(totalRevenue)}
+                {formatCurrency(totalRevenue)}
               </strong>
             </span>
           </div>
@@ -204,7 +238,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <main className="p-6 max-w-[1200px] w-full mx-auto">
           {activeTab === 'orders' && (
             <div className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <div>
                   <h1 className="text-xl font-semibold text-slate-900">
                     Kiosk Order Queue
@@ -213,7 +247,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     Orders submitted from the Platea Kiosk appear here for kitchen preparation.
                   </p>
                 </div>
+                <button
+                  type="button"
+                  data-testid="refresh-orders-btn"
+                  onClick={onRefreshOrders}
+                  disabled={isLoadingOrders}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-wait disabled:opacity-60"
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 ${isLoadingOrders ? 'animate-spin' : ''}`}
+                  />
+                  Refresh
+                </button>
               </div>
+
+              {ordersError && (
+                <div
+                  role="alert"
+                  data-testid="orders-error"
+                  className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                >
+                  Could not sync kiosk orders: {ordersError}
+                </div>
+              )}
 
               {orders.length > 0 ? (
                 <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto">
@@ -230,7 +286,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-200">
                       {orders.map((order) => (
-                        <tr key={order.orderNumber} className="hover:bg-slate-50">
+                        <tr
+                          key={order.orderNumber}
+                          data-testid={`admin-order-${order.orderNumber.replace('#', '')}`}
+                          className="hover:bg-slate-50"
+                        >
                           <td className="py-3 px-4 font-mono font-semibold text-slate-900 whitespace-nowrap">
                             {order.orderNumber}
                           </td>
@@ -246,11 +306,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {order.paymentMethod}
                           </td>
                           <td className="py-3 px-4 text-right font-medium text-slate-900 tabular-nums whitespace-nowrap">
-                            ₱ {formatMoney(order.total)}
+                            {formatCurrency(order.total)}
                           </td>
                           <td className="py-3 px-4 whitespace-nowrap">
                             <select
                               value={order.status}
+                              data-testid={`order-status-${order.orderNumber.replace('#', '')}`}
                               aria-label={`Status for ${order.orderNumber}`}
                               onChange={(e) =>
                                 onUpdateOrderStatus(
@@ -271,6 +332,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       ))}
                     </tbody>
                   </table>
+                </div>
+              ) : isLoadingOrders ? (
+                <div
+                  data-testid="orders-loading"
+                  className="bg-white border border-slate-200 rounded-lg p-10 text-center text-sm text-slate-600"
+                >
+                  Loading kiosk orders…
+                </div>
+              ) : ordersError ? (
+                <div className="bg-white border border-slate-200 rounded-lg p-10 text-center">
+                  <p className="text-base font-medium text-slate-800">
+                    Orders are temporarily unavailable
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    Refresh to retry syncing the order queue.
+                  </p>
                 </div>
               ) : (
                 <div className="bg-white border border-slate-200 rounded-lg p-10 text-center">
@@ -488,6 +565,118 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </table>
               </div>
             </div>
+          )}
+
+          {activeTab === 'rewards' && (
+            <section className="space-y-5" data-testid="admin-loyalty-panel">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h1 className="text-xl font-semibold text-slate-900">
+                    Platea Loyalty Rewards
+                  </h1>
+                  <p className="text-sm text-slate-600 mt-0.5">
+                    Review student points and audit every earning, redemption, and reset.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  data-testid="reset-semester-points-btn"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        'Reset loyalty points for all students at the start of a new semester?',
+                      )
+                    ) {
+                      onResetSemesterPoints();
+                    }
+                  }}
+                  disabled={students.length === 0}
+                  className="px-4 py-2 rounded-lg bg-[#04502a] hover:bg-[#0b6b38] disabled:opacity-50 text-white text-sm font-medium cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Reset Semester Points
+                </button>
+              </div>
+
+              {rewardsError && (
+                <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                  {rewardsError}
+                </p>
+              )}
+
+              <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                      <th className="py-2.5 px-4">Student ID</th>
+                      <th className="py-2.5 px-4">Name</th>
+                      <th className="py-2.5 px-4">Course</th>
+                      <th className="py-2.5 px-4 text-right">Loyalty Points</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {students.map((student) => (
+                      <tr key={student.studentId}>
+                        <td className="py-2.5 px-4 font-medium">{student.studentId}</td>
+                        <td className="py-2.5 px-4">{student.name}</td>
+                        <td className="py-2.5 px-4 text-slate-600">{student.course}</td>
+                        <td className="py-2.5 px-4 text-right font-semibold tabular-nums">
+                          {student.loyaltyPoints}
+                        </td>
+                      </tr>
+                    ))}
+                    {students.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="py-8 text-center text-slate-500">
+                          No student accounts are available yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-white border border-slate-200 rounded-lg overflow-x-auto">
+                <table className="w-full text-left border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                      <th className="py-2.5 px-4">Date</th>
+                      <th className="py-2.5 px-4">Student ID</th>
+                      <th className="py-2.5 px-4">Activity</th>
+                      <th className="py-2.5 px-4">Order</th>
+                      <th className="py-2.5 px-4 text-right">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {loyaltyTransactions.map((transaction) => (
+                      <tr key={transaction.id}>
+                        <td className="py-2.5 px-4 text-slate-600 whitespace-nowrap">
+                          {new Date(transaction.createdAt).toLocaleString()}
+                        </td>
+                        <td className="py-2.5 px-4">{transaction.studentId}</td>
+                        <td className="py-2.5 px-4">
+                          <span className="font-medium">{transaction.type}</span>
+                          <span className="block text-xs text-slate-500">
+                            {transaction.description}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-4">{transaction.orderNumber ?? '—'}</td>
+                        <td className="py-2.5 px-4 text-right font-semibold tabular-nums">
+                          {transaction.pointsChange > 0 ? '+' : ''}
+                          {transaction.pointsChange}
+                        </td>
+                      </tr>
+                    ))}
+                    {loyaltyTransactions.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-slate-500">
+                          No loyalty activity has been recorded yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
           )}
 
           {activeTab === 'testing' && (

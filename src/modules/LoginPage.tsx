@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { ArrowRight, User } from 'lucide-react';
 import { PlateaLogo } from '../components/PlateaLogo';
+import { getStudentById } from '../data/studentData';
 
 interface LoginPageProps {
   initialStudentId: string;
   onBack: () => void;
-  onContinue: (studentId: string) => void;
+  onContinue: (studentId: string) => void | Promise<void>;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({
@@ -17,7 +18,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = studentId.trim();
     if (!trimmed) {
@@ -25,8 +26,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       inputRef.current?.focus();
       return;
     }
+    if (!getStudentById(trimmed)) {
+      setError('Student ID not found. Please check your ID or continue as a guest.');
+      inputRef.current?.focus();
+      return;
+    }
     setError('');
-    onContinue(trimmed);
+    try {
+      await onContinue(trimmed);
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'Unable to load your student account.',
+      );
+      inputRef.current?.focus();
+    }
   };
 
   return (

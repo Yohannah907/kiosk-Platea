@@ -7,6 +7,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const HEADLESS = process.env.HEADLESS === '1';
 
 const results = [];
+let submittedOrderNumber = '';
 
 async function runCase(moduleName, id, description, expected, fn) {
   const started = Date.now();
@@ -96,14 +97,14 @@ async function main() {
     await runCase(
       'Login Page',
       'TC-002',
-      'Verify entering Student ID 2026-0001 and clicking Continue to Menu.',
+      'Verify entering a hardcoded student ID and clicking Continue to Menu.',
       'Menu Page is displayed with Student ID.',
       async () => {
         const input = await driver.findElement(
           By.css('[data-testid="student-id-input"]'),
         );
-        await input.sendKeys('2026-0001');
-        assert.equal(await input.getAttribute('value'), '2026-0001');
+        await input.sendKeys('7230515');
+        assert.equal(await input.getAttribute('value'), '7230515');
 
         const submitBtn = await driver.findElement(
           By.css('[data-testid="login-submit-btn"]'),
@@ -113,7 +114,7 @@ async function main() {
           until.elementLocated(By.css('[data-testid="menu-page"]')),
           5000,
         );
-        return 'Student ID 2026-0001 accepted and navigated to Menu Page.';
+        return 'Configured student ID accepted and navigated to Menu Page.';
       },
     );
 
@@ -167,6 +168,9 @@ async function main() {
       'Verify clicking Add to Cart displays the confirmation modal.',
       'Added to Cart! modal is displayed.',
       async () => {
+        await driver
+          .findElement(By.css('[data-testid="category-tab-All Items"]'))
+          .click();
         const addBtn = await driver.findElement(
           By.css('[data-testid="add-to-cart-shrimp"]'),
         );
@@ -219,7 +223,7 @@ async function main() {
       'View the Cart',
       'TC-001',
       'Verify selected items and accurate order summary total on View the Cart.',
-      'Cart shows Shrimp and Shawarma with total 198.00.',
+      'Cart shows Shrimp and Shawarma with total ₱ 145.00.',
       async () => {
         await driver
           .findElement(By.css('[data-testid="view-cart-btn"]'))
@@ -231,17 +235,17 @@ async function main() {
         const total = await driver
           .findElement(By.css('[data-testid="cart-total"]'))
           .getText();
-        assert.equal(total, '198.00');
-        return 'Cart displayed 2 items with accurate computed total 198.00.';
+        assert.equal(total, '₱ 145.00');
+        return 'Cart displayed 2 items with accurate computed total ₱ 145.00.';
       },
     );
 
-    // MODULE 6: Balance & Rewards
+    // MODULE 6: Loyalty Points
     await runCase(
-      'Balance & Rewards',
+      'Loyalty Points',
       'TC-001',
-      'Verify Available Balance and Cash/GCash/PayMaya selection states.',
-      'Balance shows ₱ 890.00 and GCash can be selected.',
+      'Verify points, BYO tumbler guidance, and received rewards on the Loyalty Points page.',
+      'Loyalty Points page shows the current points and complete earning guidance.',
       async () => {
         await driver
           .findElement(By.css('[data-testid="cart-back-btn"]'))
@@ -251,27 +255,31 @@ async function main() {
           4000,
         );
         await driver
-          .findElement(By.css('[data-testid="balance-rewards-btn"]'))
+          .findElement(By.css('[data-testid="loyalty-points-btn"]'))
           .click();
         await driver.wait(
-          until.elementLocated(By.css('[data-testid="balance-page"]')),
+          until.elementLocated(By.css('[data-testid="loyalty-points-page"]')),
           4000,
         );
-        const balanceText = await driver
-          .findElement(By.css('[data-testid="available-balance"]'))
+        const pointsText = await driver
+          .findElement(By.css('[data-testid="available-loyalty-points"]'))
           .getText();
-        assert.ok(balanceText.includes('890.00'));
-
-        const gcashBtn = await driver.findElement(
-          By.css('[data-testid="payment-option-GCash"]'),
-        );
-        await gcashBtn.click();
-        assert.equal(await gcashBtn.getAttribute('aria-checked'), 'true');
+        assert.ok(pointsText.includes('pts'));
+        const guidelines = await driver
+          .findElement(By.css('[data-testid="loyalty-guidelines"]'))
+          .getText();
+        assert.ok(guidelines.includes('₱40'));
+        assert.ok(guidelines.includes('Happy Hour'));
+        assert.ok(guidelines.includes('BYO'));
+        assert.ok(guidelines.includes('2 bonus points'));
+        const pageSource = await driver.getPageSource();
+        assert.ok(!pageSource.includes('Balance & Rewards'));
+        assert.ok(!pageSource.includes('Available Balance'));
 
         await driver
-          .findElement(By.css('[data-testid="balance-back-btn"]'))
+          .findElement(By.css('[data-testid="loyalty-points-back-btn"]'))
           .click();
-        return 'Available Balance ₱ 890.00 verified and GCash selected.';
+        return 'Loyalty Points page displays points and BYO guidance without the old balance-and-rewards view.';
       },
     );
 
@@ -279,7 +287,7 @@ async function main() {
     await runCase(
       'Order Success',
       'TC-001',
-      'Verify Confirm Order displays Order Success with #PLT-001, 198.00, GCash, and Confirmed.',
+      'Verify Confirm Order displays a sequential order number, ₱ 145.00, GCash, and Confirmed.',
       'Order Success page displays accurate confirmation summary.',
       async () => {
         await driver
@@ -289,6 +297,31 @@ async function main() {
           until.elementLocated(By.css('[data-testid="confirm-order-btn"]')),
           4000,
         );
+        const pointsOption = await driver.findElement(
+          By.css('[data-testid="cart-payment-select"] option[value="Loyalty Points"]'),
+        );
+        const pointsText = await driver
+          .findElement(By.css('[data-testid="cart-loyalty-points"]'))
+          .getText();
+        const availablePoints = Number.parseInt(pointsText, 10);
+        assert.ok((await pointsOption.getText()).includes(`${availablePoints} pts`));
+        assert.ok((await pointsOption.getText()).includes('₱'));
+        assert.equal(
+          await pointsOption.isEnabled(),
+          availablePoints >= 1450,
+          'Loyalty Points should be selectable only when they cover the full ₱145 order.',
+        );
+        assert.equal(
+          await driver
+            .findElements(
+              By.css('[data-testid="cart-payment-select"] option[value="Balance"]'),
+            )
+            .then((options) => options.length),
+          0,
+        );
+        await driver
+          .findElement(By.css('[data-testid="cart-payment-select"]'))
+          .sendKeys('GCash');
         await driver
           .findElement(By.css('[data-testid="confirm-order-btn"]'))
           .click();
@@ -300,6 +333,7 @@ async function main() {
         const orderNo = await driver
           .findElement(By.css('[data-testid="success-order-number"]'))
           .getText();
+        submittedOrderNumber = orderNo;
         const orderTotal = await driver
           .findElement(By.css('[data-testid="success-order-total"]'))
           .getText();
@@ -310,8 +344,8 @@ async function main() {
           .findElement(By.css('[data-testid="success-order-status"]'))
           .getText();
 
-        assert.equal(orderNo, '#PLT-001');
-        assert.equal(orderTotal, '198.00');
+        assert.match(orderNo, /^#PLT-\d{3,}$/);
+        assert.equal(orderTotal, '₱ 145.00');
         assert.equal(orderPay, 'GCash');
         assert.equal(orderStatus, 'Confirmed');
 
@@ -322,7 +356,46 @@ async function main() {
           until.elementLocated(By.css('[data-testid="menu-page"]')),
           4000,
         );
-        return 'Order #PLT-001 confirmed (198.00, GCash) and Back to Menu returned cleanly.';
+        return `Order ${orderNo} confirmed (₱ 145.00, GCash) and Back to Menu returned cleanly.`;
+      },
+    );
+
+    await runCase(
+      'Admin Kiosk Order Queue',
+      'TC-001',
+      'Verify submitted kiosk orders appear in the admin queue and status changes persist.',
+      'Admin queue shows the submitted order and retains its updated status after reload.',
+      async () => {
+        await driver.get(`${BASE_URL}/#admin`);
+        const orderRow = await driver.wait(
+          until.elementLocated(
+            By.css(
+              `[data-testid="admin-order-${submittedOrderNumber.replace('#', '')}"]`,
+            ),
+          ),
+          8000,
+        );
+        assert.ok((await orderRow.getText()).includes(submittedOrderNumber));
+
+        const statusSelect = await driver.findElement(
+          By.css(
+            `[data-testid="order-status-${submittedOrderNumber.replace('#', '')}"]`,
+          ),
+        );
+        await statusSelect.sendKeys('Ready');
+        await driver.wait(async () => (await statusSelect.getAttribute('value')) === 'Ready', 4000);
+
+        await driver.get(`${BASE_URL}/#admin`);
+        const persistedStatus = await driver.wait(
+          until.elementLocated(
+            By.css(
+              `[data-testid="order-status-${submittedOrderNumber.replace('#', '')}"]`,
+            ),
+          ),
+          8000,
+        );
+        await driver.wait(async () => (await persistedStatus.getAttribute('value')) === 'Ready', 4000);
+        return `${submittedOrderNumber} appeared in the queue and retained Ready status after reload.`;
       },
     );
   } finally {

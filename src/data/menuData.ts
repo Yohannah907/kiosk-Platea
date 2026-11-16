@@ -1,8 +1,5 @@
 import { Category, MenuItem, PaymentMethod } from '../types/kiosk';
 
-export const UNIT_PRICE = 99;
-export const INITIAL_BALANCE = 890;
-
 export const CATEGORIES: Category[] = [
   'All Items',
   'Meals',
@@ -17,7 +14,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'combo-meal-1': {
     id: 'combo-meal-1',
     name: 'Combo Meal #1',
-    price: UNIT_PRICE,
+    price: 85,
     image: '/images/combo-meal-1.jpg',
     emoji: '🍽️',
     contain: true,
@@ -26,7 +23,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   sinigang: {
     id: 'sinigang',
     name: 'Sinigang',
-    price: UNIT_PRICE,
+    price: 60,
     image: '/images/sinigang.jpg',
     emoji: '🍲',
     keywords: 'pork soup tamarind broth meal',
@@ -34,7 +31,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   shrimp: {
     id: 'shrimp',
     name: 'Shrimp',
-    price: UNIT_PRICE,
+    price: 80,
     image: '/images/shrimp.jpg',
     emoji: '🍤',
     keywords: 'seafood prawn garlic butter meal',
@@ -42,73 +39,73 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   ampalaya: {
     id: 'ampalaya',
     name: 'Ampalaya',
-    price: UNIT_PRICE,
+    price: 40,
     image: '/images/ampalaya.jpg',
     emoji: '🥬',
     keywords: 'bitter melon egg vegetable meal',
   },
-  'mango-shake': {
-    id: 'mango-shake',
-    name: 'Mango Shake',
-    price: UNIT_PRICE,
-    image: '/images/mango-shake.jpg',
-    emoji: '🥭',
-    keywords: 'mango juice smoothie fruit drink',
+  'fried-rice': {
+    id: 'fried-rice',
+    name: 'Fried Rice',
+    price: 35,
+    image: '/images/fried-rice.jpg',
+    emoji: '🍚',
+    keywords: 'fried rice egg vegetable chicken garlic meal',
   },
   spaghetti: {
     id: 'spaghetti',
     name: 'Spaghetti',
-    price: UNIT_PRICE,
+    price: 45,
     image: '/images/spaghetti.jpg',
     emoji: '🍝',
     keywords: 'pasta noodles meat sauce hotdog meal',
   },
+  'beef-stake': {
+    id: 'beef-stake',
+    name: 'Beef Steak',
+    price: 75,
+    image: '/images/beef-stake.jpg',
+    emoji: '🥩',
+    keywords: 'beef steak bistek onion meat meal',
+  },
+  champorado: {
+    id: 'champorado',
+    name: 'Champorado',
+    price: 45,
+    image: '/images/champorado.jpg',
+    emoji: '🍫',
+    keywords: 'chocolate rice porridge sweet breakfast',
+  },
+  'mango-shake': {
+    id: 'mango-shake',
+    name: 'Mango Shake',
+    price: 55,
+    image: '/images/mango-shake.jpg',
+    emoji: '🥭',
+    keywords: 'mango juice smoothie fruit drink',
+  },
   cinnamon: {
     id: 'cinnamon',
     name: 'Cinnamon',
-    price: UNIT_PRICE,
+    price: 40,
     image: '/images/cinnamon.jpg',
     emoji: '🥐',
     contain: true,
     keywords: 'roll pastry bread cinnamon bun sweet',
   },
-  champorado: {
-    id: 'champorado',
-    name: 'Champorado',
-    price: UNIT_PRICE,
-    image: '/images/champorado.jpg',
-    emoji: '🍫',
-    keywords: 'chocolate rice porridge sweet breakfast',
-  },
   'matcha-latte': {
     id: 'matcha-latte',
     name: 'Matcha Latte',
-    price: UNIT_PRICE,
+    price: 70,
     image: '/images/matcha-latte.jpg',
     emoji: '🍵',
     contain: true,
     keywords: 'matcha green tea iced milk coffee drink',
   },
-  'fried-rice': {
-    id: 'fried-rice',
-    name: 'Fried Rice',
-    price: UNIT_PRICE,
-    image: '/images/fried-rice.jpg',
-    emoji: '🍚',
-    keywords: 'rice egg vegetable chicken garlic fried rice meal',
-  },
-  'beef-stake': {
-    id: 'beef-stake',
-    name: 'Beef Stake',
-    price: UNIT_PRICE,
-    image: '/images/beef-stake.jpg',
-    emoji: '🥩',
-    keywords: 'beef steak bistek onion meat meal',
-  },
   biko: {
     id: 'biko',
-    name: 'Biko wd Peanuts',
-    price: UNIT_PRICE,
+    name: 'Biko with Peanuts',
+    price: 35,
     image: '/images/biko.jpg',
     emoji: '🍘',
     keywords: 'rice cake sticky peanut kakanin sweet',
@@ -116,7 +113,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   shawarma: {
     id: 'shawarma',
     name: 'Shawarma',
-    price: UNIT_PRICE,
+    price: 65,
     image: '/images/shawarma.jpg',
     emoji: '🌯',
     keywords: 'wrap beef chicken pita snack',
@@ -124,7 +121,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   burger: {
     id: 'burger',
     name: 'Burger',
-    price: UNIT_PRICE,
+    price: 45,
     image: '/images/burger.jpg',
     emoji: '🍔',
     keywords: 'crispy chicken sandwich cheese lettuce bun snack',
@@ -132,7 +129,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   donuts: {
     id: 'donuts',
     name: 'Donuts',
-    price: UNIT_PRICE,
+    price: 25,
     image: '/images/donuts.jpg',
     emoji: '🍩',
     keywords: 'donut doughnut glazed sprinkles sweet snack',
@@ -140,7 +137,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'combo-snacks': {
     id: 'combo-snacks',
     name: 'Combo Snacks',
-    price: UNIT_PRICE,
+    price: 85,
     image: '/images/combo-snacks.jpg',
     emoji: '🍟',
     contain: true,
@@ -149,7 +146,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   cookies: {
     id: 'cookies',
     name: 'Cookies',
-    price: UNIT_PRICE,
+    price: 25,
     image: '/images/cookies.jpg',
     emoji: '🍪',
     contain: true,
@@ -158,7 +155,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   waffle: {
     id: 'waffle',
     name: 'Waffle',
-    price: UNIT_PRICE,
+    price: 35,
     image: '/images/waffle.jpg',
     emoji: '🧇',
     contain: true,
@@ -167,7 +164,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   macaroons: {
     id: 'macaroons',
     name: 'Macaroons',
-    price: UNIT_PRICE,
+    price: 35,
     image: '/images/macaroons.jpg',
     emoji: '🍬',
     contain: true,
@@ -176,7 +173,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'graham-bar': {
     id: 'graham-bar',
     name: 'Graham Bar',
-    price: UNIT_PRICE,
+    price: 40,
     image: '/images/graham-bar.jpg',
     emoji: '🍫',
     keywords: 'ice cream sandwich cookies cream graham dessert',
@@ -184,7 +181,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'oreo-shake': {
     id: 'oreo-shake',
     name: 'Oreo Shake',
-    price: UNIT_PRICE,
+    price: 55,
     image: '/images/oreo-shake.jpg',
     emoji: '🥤',
     contain: true,
@@ -193,7 +190,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'halo-halo': {
     id: 'halo-halo',
     name: 'Halo-halo',
-    price: UNIT_PRICE,
+    price: 55,
     image: '/images/halo-halo.jpg',
     emoji: '🍧',
     keywords: 'ube ice shaved pinoy dessert sweet',
@@ -201,7 +198,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'leche-flan': {
     id: 'leche-flan',
     name: 'Leche Flan',
-    price: UNIT_PRICE,
+    price: 45,
     image: '/images/leche-flan.jpg',
     emoji: '🍮',
     keywords: 'flan custard caramel sweet dessert',
@@ -209,7 +206,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'orange-drink': {
     id: 'orange-drink',
     name: 'Orange Drink',
-    price: UNIT_PRICE,
+    price: 25,
     image: '/images/orange-drink.jpg',
     emoji: '🍊',
     contain: true,
@@ -218,7 +215,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'spanish-latte': {
     id: 'spanish-latte',
     name: 'Spanish Latte',
-    price: UNIT_PRICE,
+    price: 75,
     image: '/images/spanish-latte.jpg',
     emoji: '☕',
     keywords: 'coffee iced espresso milk sweet drink',
@@ -226,7 +223,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'hot-americano': {
     id: 'hot-americano',
     name: 'Hot Black Americano',
-    price: UNIT_PRICE,
+    price: 50,
     image: '/images/hot-americano.jpg',
     emoji: '☕',
     keywords: 'coffee black hot espresso cup drink',
@@ -234,7 +231,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'iced-tea': {
     id: 'iced-tea',
     name: 'Iced Tea',
-    price: UNIT_PRICE,
+    price: 25,
     image: '/images/iced-tea.jpg',
     emoji: '🍹',
     contain: true,
@@ -243,7 +240,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'coca-cola': {
     id: 'coca-cola',
     name: 'Coca Cola',
-    price: UNIT_PRICE,
+    price: 30,
     image: '/images/coca-cola.jpg',
     emoji: '🥫',
     contain: true,
@@ -252,7 +249,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'calamansi-juice': {
     id: 'calamansi-juice',
     name: 'Calamansi Juice',
-    price: UNIT_PRICE,
+    price: 25,
     image: '/images/calamansi-juice.jpg',
     emoji: '🍋',
     contain: true,
@@ -261,7 +258,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
   'white-mocha': {
     id: 'white-mocha',
     name: 'White Mocha',
-    price: UNIT_PRICE,
+    price: 70,
     image: '/images/white-mocha.jpg',
     emoji: '🧋',
     contain: true,
@@ -270,17 +267,7 @@ export const MENU_ITEMS: Record<string, MenuItem> = {
 };
 
 export const CATEGORY_ITEM_IDS: Record<Category, string[]> = {
-  'All Items': [
-    'combo-meal-1',
-    'sinigang',
-    'shrimp',
-    'ampalaya',
-    'mango-shake',
-    'spaghetti',
-    'cinnamon',
-    'champorado',
-    'matcha-latte',
-  ],
+  'All Items': Object.values(MENU_ITEMS).map((item) => item.id),
   Meals: [
     'combo-meal-1',
     'sinigang',
@@ -335,4 +322,8 @@ export function getItemCategories(id: string): Category[] {
 
 export function formatMoney(amount: number): string {
   return amount.toFixed(2);
+}
+
+export function formatCurrency(amount: number): string {
+  return `₱ ${formatMoney(amount)}`;
 }

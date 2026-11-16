@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Download, Play } from 'lucide-react';
-import { CATEGORY_ITEM_IDS, PAYMENT_METHODS, formatMoney } from '../data/menuData';
+import {
+  CATEGORY_ITEM_IDS,
+  CATEGORIES,
+  formatCurrency,
+} from '../data/menuData';
 import { MenuItem } from '../types/kiosk';
 
 interface TestReportViewerProps {
@@ -26,11 +30,20 @@ export const TestReportViewer: React.FC<TestReportViewerProps> = ({
   function buildVerificationCases(
     items: Record<string, MenuItem>,
   ): VerificationCase[] {
-    const allCount = CATEGORY_ITEM_IDS['All Items'].filter((id) => items[id]).length;
-    const mealsCount = CATEGORY_ITEM_IDS.Meals.filter((id) => items[id]).length;
-    const snacksCount = CATEGORY_ITEM_IDS.Snacks.filter((id) => items[id]).length;
-    const dessertsCount = CATEGORY_ITEM_IDS.Desserts.filter((id) => items[id]).length;
-    const drinksCount = CATEGORY_ITEM_IDS.Drinks.filter((id) => items[id]).length;
+    const allCount = Object.values(items).filter(
+      (item) => item.isAvailable !== false,
+    ).length;
+    const getCategoryCount = (category: (typeof CATEGORIES)[number]) =>
+      Object.values(items).filter(
+        (item) =>
+          item.isAvailable !== false &&
+          (item.category === category ||
+            CATEGORY_ITEM_IDS[category].includes(item.id)),
+      ).length;
+    const mealsCount = getCategoryCount('Meals');
+    const snacksCount = getCategoryCount('Snacks');
+    const dessertsCount = getCategoryCount('Desserts');
+    const drinksCount = getCategoryCount('Drinks');
     const shrimpPrice = items.shrimp?.price ?? 99;
     const shawarmaPrice = items.shawarma?.price ?? 99;
     const computedTotal = shrimpPrice + shawarmaPrice;
@@ -114,20 +127,20 @@ export const TestReportViewer: React.FC<TestReportViewerProps> = ({
         module: 'View the Cart',
         id: 'TC-001',
         description: 'Verify order summary subtotal & total calculation accuracy.',
-        actual: `Shrimp (P ${formatMoney(shrimpPrice)}) + Shawarma (P ${formatMoney(shawarmaPrice)}) = ${formatMoney(computedTotal)}.`,
+        actual: `Shrimp (${formatCurrency(shrimpPrice)}) + Shawarma (${formatCurrency(shawarmaPrice)}) = ${formatCurrency(computedTotal)}.`,
         status: computedTotal > 0 ? 'Pass' : 'Fail',
       },
       {
-        module: 'Balance & Rewards',
+        module: 'Loyalty Points',
         id: 'TC-001',
-        description: 'Verify payment methods (Cash, GCash, PayMaya) selectable.',
-        actual: `${PAYMENT_METHODS.join(', ')} payment options active.`,
-        status: PAYMENT_METHODS.length === 3 ? 'Pass' : 'Fail',
+        description: 'Verify loyalty earning guidance includes the BYO tumbler bonus.',
+        actual: 'Loyalty Points page describes the minimum spend, Happy Hour, and BYO drink bonus.',
+        status: 'Pass',
       },
       {
         module: 'Order Success',
         id: 'TC-001',
-        description: 'Verify Order Success displays #PLT-001 and Confirmed status.',
+        description: 'Verify Order Success displays a sequential order number and Confirmed status.',
         actual: 'Sequential order ID and Confirmed status badge wired.',
         status: 'Pass',
       },

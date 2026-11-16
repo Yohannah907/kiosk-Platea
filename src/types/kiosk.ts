@@ -3,13 +3,13 @@ export type ScreenId =
   | 'login'
   | 'menu'
   | 'cart'
-  | 'balance'
+  | 'loyalty-points'
   | 'success'
   | 'admin';
 
 export type Category = 'All Items' | 'Meals' | 'Snacks' | 'Desserts' | 'Drinks';
 
-export type PaymentMethod = 'Cash' | 'GCash' | 'PayMaya';
+export type PaymentMethod = 'Cash' | 'GCash' | 'PayMaya' | 'Loyalty Points';
 
 export interface MenuItem {
   id: string;
@@ -23,6 +23,29 @@ export interface MenuItem {
   isAvailable?: boolean;
 }
 
+export interface StudentRecord {
+  studentId: string;
+  name: string;
+  course: string;
+  initialBalance: number;
+  loyaltyPoints?: number;
+}
+
+export interface LoyaltyTransaction {
+  id: number;
+  studentId: string;
+  pointsChange: number;
+  type: 'Earned' | 'Redeemed' | 'Reset';
+  description: string;
+  orderNumber: string | null;
+  createdAt: string;
+}
+
+export interface StudentAccount extends StudentRecord {
+  balance: number;
+  loyaltyPoints: number;
+}
+
 export type CartMap = Record<string, number>;
 
 export interface OrderSummary {
@@ -30,11 +53,14 @@ export interface OrderSummary {
   total: number;
   paymentMethod: PaymentMethod;
   status: 'Confirmed';
+  pointsEarned?: number;
+  pointsRedeemed?: number;
 }
 
 export type AdminOrderStatus = 'Confirmed' | 'Preparing' | 'Ready' | 'Completed';
 
 export interface AdminOrderRecord {
+  id?: number;
   orderNumber: string;
   studentId: string;
   paymentMethod: PaymentMethod;

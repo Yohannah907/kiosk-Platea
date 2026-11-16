@@ -17,29 +17,29 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
     <section
       data-testid="welcome-page"
       aria-label="Welcome Page"
-      className="mint-grain-surface min-h-screen flex items-center justify-center px-6 py-10 lg:px-20 lg:py-14"
+      className="mint-grain-surface min-h-screen flex items-center justify-center px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-6"
     >
-      <div className="w-full max-w-[1160px] grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-stretch">
-        <div className="flex flex-col justify-between py-2">
+      <div className="w-full max-w-[1120px] grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-14 items-center">
+        <div className="flex flex-col justify-between py-1">
           <div>
             <PlateaLogo />
           </div>
 
-          <div className="my-10 lg:my-0">
-            <p className="uppercase tracking-wide text-[20px] sm:text-[22px] text-[#0b5a14] mb-3">
+          <div className="my-6 lg:my-0">
+            <p className="uppercase tracking-[0.12em] text-[15px] sm:text-[17px] text-[#0b5a14] mb-3">
               Campus dining reimagined
             </p>
-            <h1 className="text-[40px] sm:text-[48px] font-medium leading-[1.15] text-[#0b5a14] mb-8 max-w-[440px]">
+            <h1 className="text-[34px] sm:text-[40px] lg:text-[44px] font-medium leading-[1.12] text-[#0b5a14] mb-5 max-w-[440px]">
               Your campus, served beautifully.
             </h1>
-            <p className="text-[22px] sm:text-[26px] leading-[1.28] text-[#0b5a14] max-w-[430px] mb-10">
+            <p className="text-[17px] sm:text-[19px] leading-[1.4] text-[#0b5a14] max-w-[430px] mb-6">
               Discover your favorite meals and make every campus break delicious.
             </p>
             <button
               type="button"
               data-testid="welcome-start-btn"
               onClick={onStartOrder}
-              className="inline-flex items-center justify-center gap-3 bg-[#073d09] hover:bg-[#0b5a14] text-[#b8f8b8] rounded-[14px] w-full max-w-[415px] h-[56px] text-[22px] sm:text-[24px] uppercase tracking-wide transition-colors cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-3 bg-[#073d09] hover:bg-[#0b5a14] text-[#b8f8b8] rounded-[14px] w-full max-w-[360px] h-[48px] text-[17px] sm:text-[19px] uppercase tracking-wide transition-colors cursor-pointer whitespace-nowrap"
             >
               <span>Start your order</span>
               <ArrowRight className="w-6 h-6" strokeWidth={2} />
@@ -58,7 +58,7 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({
           </div>
         </div>
 
-        <div className="rounded-[12px] overflow-hidden bg-[#273045] min-h-[380px] lg:min-h-[620px] shadow-md flex items-center justify-center">
+        <div className="rounded-[14px] overflow-hidden bg-[#273045] h-[230px] sm:h-[320px] lg:h-[min(68vh,540px)] shadow-lg flex items-center justify-center">
           {!imgError ? (
             <img
               src="/images/welcome.jpg"

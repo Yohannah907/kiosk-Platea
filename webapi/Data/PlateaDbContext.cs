@@ -11,6 +11,7 @@ public class PlateaDbContext : DbContext
     public DbSet<StudentAccount> StudentAccounts => Set<StudentAccount>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<LoyaltyTransaction> LoyaltyTransactions => Set<LoyaltyTransaction>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,6 +19,41 @@ public class PlateaDbContext : DbContext
 
         modelBuilder.Entity<MenuItem>().HasIndex(m => m.Slug).IsUnique();
         modelBuilder.Entity<StudentAccount>().HasIndex(s => s.StudentId).IsUnique();
+        modelBuilder.Entity<StudentAccount>()
+            .Property(s => s.StudentId)
+            .HasColumnName("student_id");
+        modelBuilder.Entity<StudentAccount>()
+            .Property(s => s.FullName)
+            .HasColumnName("name");
+        modelBuilder.Entity<StudentAccount>()
+            .Property(s => s.Course)
+            .HasColumnName("course");
+        modelBuilder.Entity<StudentAccount>()
+            .Property(s => s.Balance)
+            .HasColumnName("balance");
+        modelBuilder.Entity<StudentAccount>()
+            .Property(s => s.LoyaltyPoints)
+            .HasColumnName("loyalty_points");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .Property(t => t.StudentAccountId)
+            .HasColumnName("student_account_id");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .Property(t => t.PointsChange)
+            .HasColumnName("points_change");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .Property(t => t.Type)
+            .HasColumnName("transaction_type");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .Property(t => t.OrderNumber)
+            .HasColumnName("order_number");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .Property(t => t.CreatedAt)
+            .HasColumnName("created_at");
+        modelBuilder.Entity<LoyaltyTransaction>()
+            .HasOne(t => t.StudentAccount)
+            .WithMany(s => s.LoyaltyTransactions)
+            .HasForeignKey(t => t.StudentAccountId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<StudentAccount>().HasData(
             new StudentAccount
@@ -26,7 +62,7 @@ public class PlateaDbContext : DbContext
                 StudentId = "2026-0001",
                 FullName = "Sample Student",
                 Balance = 890.00m,
-                RewardsPoints = 120
+                LoyaltyPoints = 120
             }
         );
 
